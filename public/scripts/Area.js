@@ -36,7 +36,7 @@ class Area {
       this.subareas = images.map((img) => new Area(img, maxDepth));
 
       this.subareas.forEach((area) => {
-        document.getElementById("tmp").append(area.image);
+        // document.getElementById("tmp").append(area.image);
         area.subdivide(depth + 1, maxDepth);
       });
     });

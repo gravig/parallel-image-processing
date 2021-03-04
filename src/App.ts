@@ -11,7 +11,7 @@ export default class App {
   private server: http.Server;
   private io: IO.Server;
 
-  public getServer = () => {
+  public getServer = (): http.Server => {
     return this.server;
   };
 
@@ -39,7 +39,9 @@ export default class App {
 
       // = Handle processing request =
       socket.on("image", (image, callback) => {
-        callback({ image: "ready" });
+        manager.requestProcessing(image).then((result) => {
+          callback(result);
+        });
       });
 
       // = Handle disconnection =

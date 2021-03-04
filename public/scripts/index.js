@@ -1,3 +1,40 @@
+const getImageData = (image) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(image, 0, 0);
+  ctx.stroke();
+
+  return ctx.getImageData(0, 0, image.width, image.height);
+};
+
+const imageFromData = (imageData, w, h) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+
+  ctx.putImageData(imageData, 0, 0);
+  const dataUrl = canvas.toDataURL();
+
+  return dataUrl;
+};
+
+const transform = (image) =>
+  new Promise((res) => {
+    const imageData = getImageData(image);
+
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      imageData.data[i] = 0;
+    }
+
+    const src = imageFromData(imageData, image.width, image.height);
+
+    res(src);
+  });
+
 window.onload = () => {
   const WIDTH = 960;
   const HEIGHT = 480;
@@ -39,14 +76,23 @@ window.onload = () => {
 
     area.forEachFragment((area) => {
       socket.emit("image", area.image.src, (result) => {
-        console.log({ result });
+        const img = document.createElement("img");
+        img.src = result;
+
+        img.onload = () => {
+          document.getElementById("tmp").append(img);
+        };
       });
     });
-
-    // socket.emit("image", { image: "elo" });
   });
 
-  socket.on("process-image", (image) => {
-    console.log({ image });
+  socket.on("process-image", (image, callback) => {
+    // change image here
+    const img = document.createElement("img");
+    img.src = image;
+
+    img.onload = () => {
+      transform(img).then((r) => callback(r));
+    };
   });
 };
