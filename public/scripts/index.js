@@ -32,7 +32,9 @@ const transform = (image) =>
 
     const src = imageFromData(imageData, image.width, image.height);
 
-    res(src);
+    setTimeout(() => {
+      res(src);
+    }, 7000);
   });
 
 window.onload = () => {
@@ -63,7 +65,7 @@ window.onload = () => {
         context.drawImage(img, 0, 0);
         context.stroke();
 
-        area = new Area(img, 2);
+        area = new Area(img, 1);
         area.subdivide();
       };
     };
@@ -92,7 +94,11 @@ window.onload = () => {
     img.src = image;
 
     img.onload = () => {
-      transform(img).then((r) => callback(r));
+      transform(img).then((r) => {
+        img.src = r;
+        document.getElementById("tmp").append(img);
+        callback(r);
+      });
     };
   });
 };

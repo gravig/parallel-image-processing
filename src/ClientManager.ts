@@ -1,43 +1,34 @@
-import { Socket } from "socket.io";
+import { cloneDeep } from "lodash";
+import Client from "./Client";
+import Observable from "./lib/Observable";
+import Observer from "./lib/Observer";
 
-export class Client {
-  public socket: Socket;
-  private _isBusy: boolean;
-
-  constructor(socket: Socket) {
-    this.socket = socket;
-  }
-
-  public isBusy = (): boolean => {
-    return this._isBusy;
-  };
-
-  public setBusy = (value: boolean): void => {
-    this._isBusy = value;
-  };
-
-  public manipulateImage = (dataURL: string): Promise<unknown> =>
-    new Promise((res) => {
-      this.socket.emit("process-image", dataURL, (result: string) => {
-        res(result);
-      });
-    });
-}
-
-export default class ClientManager {
+export default class ClientManager extends Observable {
   private queue: string[] = [];
   private clients: Client[] = [];
 
   public addClient = (client: Client): void => {
     this.clients.push(client);
+    this.notify();
+  };
+
+  public getClients = (): Client[] => {
+    return cloneDeep(this.clients);
   };
 
   public removeClient = (client: Client): void => {
     this.clients = this.clients.filter((c) => c !== client);
+    this.notify();
   };
 
   private getIdleClient = (): Client | null => {
     return this.clients.find((client: Client) => !client.isBusy());
+  };
+
+  public useLogger = (logger: Observer): void => {
+    if (this.hasObserver(logger)) return;
+
+    this.subscribe(logger);
   };
 
   public requestProcessing = (dataURL: string): Promise<unknown> =>
@@ -47,9 +38,11 @@ export default class ClientManager {
       if (client) {
         client.manipulateImage(dataURL).then((image) => {
           res(image);
+          this.notify();
         });
       } else {
         // use queue
       }
+      this.notify();
     });
 }

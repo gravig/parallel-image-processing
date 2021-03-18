@@ -1,0 +1,19 @@
+.ImageMesh {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .ImageMesh__row {
+    display: flex;
+    width: min-content;
+  }
+
+  .ImageMesh__fragment {
+    transition: all 200ms ease;
+  }
+
+  .image-gap-appear-done,
+  .image-gap-enter-done {
+    margin: 5px;
+  }
+}

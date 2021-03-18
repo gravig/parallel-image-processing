@@ -2,8 +2,9 @@ import http from "http";
 import c from "chalk";
 import express, { Express } from "express";
 import IO from "socket.io";
-import ClientManager, { Client } from "./ClientManager";
-import log from "./log";
+import ClientManager from "./ClientManager";
+import Client from "./Client";
+import Logger from "./Logger";
 
 export default class App {
   private manager: ClientManager = new ClientManager();
@@ -25,6 +26,8 @@ export default class App {
     });
     // = Serve static files =
     this.express.use("/", express.static("public"));
+
+    this.manager.useLogger(new Logger());
     this.mountSocketListeners();
   }
 
@@ -34,7 +37,6 @@ export default class App {
 
     io.on("connection", (socket: IO.Socket) => {
       const client = new Client(socket);
-      log(c.green(`[CONNECTED]`), { ID: socket.id });
       manager.addClient(client);
 
       // = Handle processing request =
@@ -47,7 +49,6 @@ export default class App {
       // = Handle disconnection =
       socket.on("disconnect", () => {
         manager.removeClient(client);
-        log(c.red(`[DISCONNECTED]`), { ID: socket.id });
       });
     });
   };
