@@ -5,6 +5,7 @@ export default class ImageFragment {
   constructor(image) {
     this.image = image;
     this.key = shortid.generate();
+    this.isLoading = false;
   }
 
   async setImageBase64(base64) {

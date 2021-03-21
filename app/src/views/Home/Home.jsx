@@ -5,6 +5,7 @@ import ImageMeshView from "../../components/ImageMesh/ImageMesh";
 import useSocket from "../../components/SocketProvider/useSocket.js";
 import useImageProcessor from "./useImageProcessor";
 import imageToBase64 from "../../scripts/imageToBase64";
+import "./Home.scss";
 
 const DEPTH = 1;
 
@@ -29,10 +30,16 @@ const Home = () => {
   }, []);
 
   const handleClickStart = useCallback(() => {
+    mesh.images.forEach((fragment) => {
+      fragment.isLoading = true;
+    });
+    setMesh(mesh.cloneDeep());
+
     mesh.images.forEach(async (fragment) => {
       const base64 = await imageToBase64(fragment.image);
 
       socket.emit("image", base64, (resultBase64) => {
+        fragment.isLoading = false;
         fragment.setImageBase64(resultBase64).then(() => {
           setMesh(mesh.cloneDeep());
         });
@@ -42,8 +49,14 @@ const Home = () => {
 
   return (
     <div className="Home">
-      <input type="file" onChange={handleSelectImage} />
-      <ImageMeshView images={mesh?.images} depth={DEPTH} />
+      {mesh ? (
+        <div className="Home__container">
+          <ImageMeshView images={mesh?.images} depth={DEPTH} />
+        </div>
+      ) : (
+        <input type="file" onChange={handleSelectImage} />
+      )}
+
       <button onClick={handleClickStart}>Start</button>
     </div>
   );

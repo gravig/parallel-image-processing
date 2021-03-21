@@ -1,6 +1,7 @@
 import React, { memo, useMemo } from "react";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { CSSTransition } from "react-transition-group";
 import shortid from "shortid";
+import Spinner from "../Spinner/Spinner";
 import "./ImageMesh.scss";
 
 const ImageMesh = ({ images = [], depth }) => {
@@ -18,22 +19,27 @@ const ImageMesh = ({ images = [], depth }) => {
     <div className="ImageMesh">
       <div className="ImageMesh__image">
         {matrix.map((row, i) => (
-          <TransitionGroup className="ImageMesh__row" key={`${id} ${i}`} appear>
-            {row.map((fragment) => (
-              <CSSTransition
-                key={fragment.key}
-                in={true}
-                timeout={300}
-                classNames="image-gap"
-              >
-                <img
-                  className="ImageMesh__fragment"
-                  src={fragment.image.src}
-                  alt="Fragment"
-                />
-              </CSSTransition>
-            ))}
-          </TransitionGroup>
+          <div className="ImageMesh__row" key={`${id} ${i}`}>
+            {row.map((fragment) => {
+              return (
+                <CSSTransition
+                  key={fragment.key}
+                  in={fragment.isLoading}
+                  timeout={300}
+                  classNames="image-gap"
+                >
+                  <div className="ImageMesh__fragment">
+                    <img
+                      className="fragment__image"
+                      src={fragment.image.src}
+                      alt="Fragment"
+                    />
+                    <Spinner open={fragment.isLoading} />
+                  </div>
+                </CSSTransition>
+              );
+            })}
+          </div>
         ))}
       </div>
     </div>

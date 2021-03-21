@@ -6,13 +6,23 @@
   .ImageMesh__row {
     display: flex;
     width: min-content;
+    width: 1200px;
+    height: auto;
+    position: relative;
   }
 
   .ImageMesh__fragment {
+    display: flex;
+    position: relative;
     transition: all 200ms ease;
+    flex: 1;
+
+    .fragment__image {
+      width: 100%;
+      height: 100%;
+    }
   }
 
-  .image-gap-appear-done,
   .image-gap-enter-done {
     margin: 5px;
   }

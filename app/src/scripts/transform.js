@@ -13,6 +13,6 @@ export default function transform(image) {
 
     setTimeout(() => {
       res(src);
-    }, 2000);
+    }, Math.random() * 6000 + 2000);
   });
 }
