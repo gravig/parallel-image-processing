@@ -4,6 +4,7 @@ const f = (v) => Math.floor(v);
 
 /**
  * Splits image in two subimages
+ * Returns array of images
  */
 export default function splitImage(image) {
   const { width: w, height: h } = image;

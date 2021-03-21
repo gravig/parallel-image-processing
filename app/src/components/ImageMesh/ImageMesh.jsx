@@ -19,16 +19,16 @@ const ImageMesh = ({ images = [], depth }) => {
       <div className="ImageMesh__image">
         {matrix.map((row, i) => (
           <TransitionGroup className="ImageMesh__row" key={`${id} ${i}`} appear>
-            {row.map((image) => (
+            {row.map((fragment) => (
               <CSSTransition
-                key={image.key}
+                key={fragment.key}
                 in={true}
                 timeout={300}
                 classNames="image-gap"
               >
                 <img
                   className="ImageMesh__fragment"
-                  src={image.src}
+                  src={fragment.image.src}
                   alt="Fragment"
                 />
               </CSSTransition>

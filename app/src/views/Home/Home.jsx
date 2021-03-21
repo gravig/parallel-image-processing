@@ -2,11 +2,14 @@ import React, { memo, useCallback, useState } from "react";
 import ImageMesh from "../../scripts/ImageMesh";
 import imageFromFile from "../../scripts/imageFromFile";
 import ImageMeshView from "../../components/ImageMesh/ImageMesh";
+import useSocket from "../../components/SocketProvider/useSocket.js";
 import useImageProcessor from "./useImageProcessor";
+import imageToBase64 from "../../scripts/imageToBase64";
 
 const DEPTH = 1;
 
 const Home = () => {
+  const { socket } = useSocket();
   const [mesh, setMesh] = useState(null);
   useImageProcessor();
 
@@ -25,10 +28,23 @@ const Home = () => {
     });
   }, []);
 
+  const handleClickStart = useCallback(() => {
+    mesh.images.forEach(async (fragment) => {
+      const base64 = await imageToBase64(fragment.image);
+
+      socket.emit("image", base64, (resultBase64) => {
+        fragment.setImageBase64(resultBase64).then(() => {
+          setMesh(mesh.cloneDeep());
+        });
+      });
+    });
+  }, [mesh, socket]);
+
   return (
     <div className="Home">
       <input type="file" onChange={handleSelectImage} />
       <ImageMeshView images={mesh?.images} depth={DEPTH} />
+      <button onClick={handleClickStart}>Start</button>
     </div>
   );
 };

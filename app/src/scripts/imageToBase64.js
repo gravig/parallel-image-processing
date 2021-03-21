@@ -4,7 +4,7 @@ export default function imageToBase64(image) {
     canvas.width = image.width;
     canvas.height = image.height;
     const context = canvas.getContext("2d");
-    context.drawImage(image);
+    context.drawImage(image, 0, 0);
 
     res(canvas.toDataURL());
   });

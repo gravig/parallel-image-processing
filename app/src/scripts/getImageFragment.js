@@ -1,5 +1,6 @@
 import shortid from "shortid";
 
+/** Returns image */
 export default function getImageFragment(image, sx, sy, ex, ey) {
   let canvas = document.createElement("canvas");
   const { width, height } = image;
