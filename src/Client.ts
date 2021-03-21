@@ -18,11 +18,8 @@ export default class Client {
   };
 
   public manipulateImage = (dataURL: string): Promise<unknown> => {
-    this._isBusy = true;
-
     return new Promise((res) => {
       this.socket.emit("process-image", dataURL, (result: string) => {
-        this._isBusy = false;
         res(result);
       });
     });

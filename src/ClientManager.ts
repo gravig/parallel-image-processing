@@ -4,7 +4,7 @@ import Observable from "./lib/Observable";
 import Observer from "./lib/Observer";
 
 export default class ClientManager extends Observable {
-  private queue: string[] = [];
+  private queue: (() => void)[] = [];
   private clients: Client[] = [];
 
   public addClient = (client: Client): void => {
@@ -31,18 +31,29 @@ export default class ClientManager extends Observable {
     this.subscribe(logger);
   };
 
-  public requestProcessing = (dataURL: string): Promise<unknown> =>
-    new Promise((res) => {
-      const client = this.getIdleClient();
+  private useStackProcessing = (dataUrl: string, done) => {
+    const client = this.getIdleClient();
 
-      if (client) {
-        client.manipulateImage(dataURL).then((image) => {
-          res(image);
-          this.notify();
-        });
-      } else {
-        // use queue
-      }
-      this.notify();
+    if (client) {
+      client.setBusy(true);
+      client.manipulateImage(dataUrl).then((image) => {
+        client.setBusy(false);
+        if (this.queue.length > 0) {
+          const fn = this.queue[0];
+          this.queue = this.queue.filter((_, i) => i !== 0);
+          fn();
+        }
+        this.notify();
+        done(image);
+      });
+    } else {
+      this.queue.push(() => this.useStackProcessing(dataUrl, done));
+    }
+    this.notify();
+  };
+
+  public requestProcessing = (dataUrl: string): Promise<unknown> =>
+    new Promise((res) => {
+      this.useStackProcessing(dataUrl, res);
     });
 }

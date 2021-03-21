@@ -13,6 +13,6 @@ export default function transform(image) {
 
     setTimeout(() => {
       res(src);
-    }, 7000);
+    }, 2000);
   });
 }
