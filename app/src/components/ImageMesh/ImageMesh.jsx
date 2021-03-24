@@ -1,47 +1,20 @@
-import React, { memo, useMemo } from "react";
-import { CSSTransition } from "react-transition-group";
-import shortid from "shortid";
-import Spinner from "../Spinner/Spinner";
+import React, { memo } from "react";
 import "./ImageMesh.scss";
 
-const ImageMesh = ({ images = [], depth }) => {
-  const id = useMemo(() => shortid.generate(), []);
-  const size = Math.pow(4, depth) / Math.pow(2, depth);
-
-  const matrix = new Array(size).fill(0).map((_, i) => {
-    const s = i * Math.pow(2, depth);
-    const e = (i + 1) * Math.pow(2, depth);
-
-    return images.slice(s, e);
-  });
+const recursiveRender = (fragment) => {
+  if (!fragment.isDivided) return <ImageFragment fragment={fragment} />;
 
   return (
+    <div className="chunk">
+      {fragment.fragments.map((f) => recursiveRender(f))}
+    </div>
+  );
+};
+
+const ImageMesh = ({ mesh }) => {
+  return (
     <div className="ImageMesh">
-      <div className="ImageMesh__image">
-        {matrix.map((row, i) => (
-          <div className="ImageMesh__row" key={`${id} ${i}`}>
-            {row.map((fragment) => {
-              return (
-                <CSSTransition
-                  key={fragment.key}
-                  in={fragment.isLoading}
-                  timeout={300}
-                  classNames="image-gap"
-                >
-                  <div className="ImageMesh__fragment">
-                    <img
-                      className="fragment__image"
-                      src={fragment.image.src}
-                      alt="Fragment"
-                    />
-                    <Spinner open={fragment.isLoading} />
-                  </div>
-                </CSSTransition>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+      <div className="ImageMesh__image">{recursiveRender(mesh.root)}</div>
     </div>
   );
 };

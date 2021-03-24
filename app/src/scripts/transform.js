@@ -11,8 +11,10 @@ export default function transform(image) {
 
     const src = imageFromData(imageData, image.width, image.height);
 
+    // Math.random() * 6000 + 2000
+
     setTimeout(() => {
       res(src);
-    }, Math.random() * 6000 + 2000);
+    }, 0);
   });
 }

@@ -7,7 +7,7 @@ import useImageProcessor from "./useImageProcessor";
 import imageToBase64 from "../../scripts/imageToBase64";
 import "./Home.scss";
 
-const DEPTH = 1;
+const DEPTH = 3;
 
 const Home = () => {
   const { socket } = useSocket();
@@ -24,20 +24,20 @@ const Home = () => {
       const _mesh = new ImageMesh(image);
 
       _mesh.divide(DEPTH).then(() => {
+        console.log(_mesh);
         setMesh(_mesh);
       });
     });
   }, []);
 
   const handleClickStart = useCallback(() => {
-    mesh.images.forEach((fragment) => {
-      fragment.isLoading = true;
+    mesh.root.forEachFragment(async (f) => {
+      f.isLoading = true;
     });
+
     setMesh(mesh.cloneDeep());
-
-    mesh.images.forEach(async (fragment) => {
+    mesh.root.forEachFragment(async (fragment) => {
       const base64 = await imageToBase64(fragment.image);
-
       socket.emit("image", base64, (resultBase64) => {
         fragment.isLoading = false;
         fragment.setImageBase64(resultBase64).then(() => {
@@ -51,7 +51,7 @@ const Home = () => {
     <div className="Home">
       {mesh ? (
         <div className="Home__container">
-          <ImageMeshView images={mesh?.images} depth={DEPTH} />
+          <ImageMeshView mesh={mesh} depth={DEPTH} />
         </div>
       ) : (
         <input type="file" onChange={handleSelectImage} />
