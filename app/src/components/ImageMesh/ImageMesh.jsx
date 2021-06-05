@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import ImageFragment from "./ImageFragment";
 import "./ImageMesh.scss";
 
 const recursiveRender = (fragment) => {
